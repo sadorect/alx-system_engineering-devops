@@ -59,11 +59,11 @@ Write a script that changes the group owner to school for the file hello
 
 14. Owner and group 
 
-Write a script that changes the owner to betty and the group owner to placeholder for all the files and directories in the working directory 
+Write a script that changes the owner to vincent and the group owner to staff for all the files and directories in the working directory 
 
 15. Symbolic links 
 
-Write a script that changes the owner and the group owner of the file _hello to betty and placeholder respectively.
+Write a script that changes the owner and the group owner of the file _hello to vincent and staff respectively.
 
 16. If only 
 
@@ -73,8 +73,4 @@ The file hello will be in the working directory
 
 17. Star Wars #advanced
 
-Write a script that will play the StarWars IV episode in the terminal. 
-
-18. RTFM #advanced
-
-Create a man that looks exactly like this one and passes all checks.
+Write a script that will play the StarWars IV episode in the terminal.
