@@ -1,2 +1,2 @@
 #!/bin/bash
-find $1 -type f -exec stat --format %y %n "{}" \; | sort -nr | head
+find . -type d -path './*' -print | wc -l
