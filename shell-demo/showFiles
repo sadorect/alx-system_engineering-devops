@@ -1,0 +1,6 @@
+#!/bin/bash
+for fn in $*; 
+do 
+   printf "vvvvvvvvvv\n$fn\n^^^^^^^^^^\n"
+   cat "$fn"
+done
