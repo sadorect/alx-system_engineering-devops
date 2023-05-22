@@ -1,39 +1,25 @@
-class nginx_install {
-  package { 'nginx':
-    ensure => installed,
-  }
+# install nginx using puppet
 
-  file { '/var/www/html/index.html':
-    ensure  => present,
-    content => 'Hello World!',
-    require => Package['nginx'],
-  }
-
-  file { '/etc/nginx/sites-available/default':
-    ensure  => present,
-    content => "server {
-                  listen 80;
-                  server_name _;
-                  root /var/www/html;
-                  location / {
-                    return 301 https://www.youtube.com;
-                  }
-                }",
-    require => Package['nginx'],
-    notify  => Service['nginx'],
-  }
-
-  file { '/etc/nginx/sites-enabled/default':
-    ensure => 'link',
-    target => '/etc/nginx/sites-available/default',
-    require => File['/etc/nginx/sites-available/default'],
-  }
-
-  service { 'nginx':
-    ensure  => running,
-    enable  => true,
-    require => [Package['nginx'], File['/etc/nginx/sites-enabled/default']],
-  }
+package {'nginx':
+  ensure => 'present',
 }
 
-include nginx_install
+exec {'install':
+  command  => 'sudo apt-get update ; sudo apt-get -y install nginx',
+  provider => shell,
+
+}
+
+exec {'Hello':
+  command  => 'echo "Hello World!" | sudo tee /var/www/html/index.html',
+  provider => shell,
+}
+
+exec {'sudo sed -i "s/listen 80 default_server;/listen 80 default_server;\\n\\tlocation \/redirect_me {\\n\\t\\treturn 301 https:\/\/www.youtube.com\/;\\n\\t}/" /etc/nginx/sites-available/default':
+  provider => shell,
+}
+
+exec {'run':
+  command  => 'sudo service nginx restart',
+  provider => shell,
+}
