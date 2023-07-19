@@ -1,37 +1,46 @@
+#!/usr/bin/python3
+""" Read data from the reddit API. """
+import json
 import requests
 
-def recurse(subreddit, hot_list=None):
-    if hot_list is None:
-        hot_list = []
 
-    url = f"https://www.reddit.com/r/{subreddit}/hot.json"
-    headers = {'User-Agent': 'Custom User Agent'}  # Add a custom User-Agent header
+def count_words(subreddit, word_list):
+    """ Queries the Reddit API and returns the count of given words
+    based on a givenn subreddit and word list:
+        Args:
+            subreddit (str):
+            word_list (list): word list
+    """
+    # Build the query string
+    if after == "":
+        AFTER = ""
+    else:
+        AFTER = "?after={}".format(after)
 
-    try:
-        response = requests.get(url, headers=headers, allow_redirects=False)
-        if response.status_code == 200:
-            data = response.json()
-            posts = data['data']['children']
-            for post in posts:
-                title = post['data']['title']
-                hot_list.append(title)
+    # build page list
+    headers = {"User-Agent": "alx2-web-app"}
+    url = "https://www.reddit.com/r/{}/hot.json{}".format(subreddit, AFTER)
+    res = requests.get(url, headers=headers, allow_redirects=False)
+    page_list = []
+    if res.status_code != 200:
+        return None
+    if "children" in res.json()["data"]:
+        for child in res.json()["data"]["children"]:
+            page_list.append(child["data"]["title"])
 
-            # Check if there is a next page
-            after = data['data']['after']
-            if after:
-                recurse(subreddit, hot_list=hot_list)  # Recursive call for next page
-            else:
-                return hot_list
-        else:
-            return None  # Invalid subreddit or other error
-    except requests.exceptions.RequestException:
-        return None  # Error occurred during the request
+    hot_list += page_list
+    if "after" not in res.json()["data"]:
+        return hot_list
+    after = res.json()["data"]["after"]
+    if after is None:
+        return hot_list
 
-# Example usage
-subreddit_name = 'python'
-titles = recurse(subreddit_name)
-if titles is not None:
-    for title in titles:
-        print(title)
-else:
-    print("No results found or invalid subreddit.")
+    return recurse(subreddit, hot_list, after)
+
+
+if __name__ == "__main__":
+    import sys
+    if len(sys.argv) < 3:
+        print("Search argument required")
+        exit()
+    print(len(count_words(sys.argv[1]), sys.argv[2]))

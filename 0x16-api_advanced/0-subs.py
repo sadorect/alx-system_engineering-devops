@@ -1,20 +1,35 @@
+#!/usr/bin/python3
+""" Read data from the reddit API. """
+import json
 import requests
 
+
 def number_of_subscribers(subreddit):
-    url = f"https://www.reddit.com/r/{subreddit}/about.json"
-    headers = {'User-Agent': 'Custom User Agent'}  # Add a custom User-Agent header
+    """ Queries the Reddit API and returns the number of subscribers
+    for a given subreddit, such as programming
+        Args:
+            subreddit (str)
+            example: "programming"
+    """
+    headers = {"User-Agent": "alx2-web-app"}
 
-    try:
-        response = requests.get(url, headers=headers, allow_redirects=False)
-        if response.status_code == 200:
-            data = response.json()
-            return data['data']['subscribers']
-        else:
-            return 0  # Invalid subreddit or other error
-    except requests.exceptions.RequestException:
-        return 0  # Error occurred during the request
+    url = "https://www.reddit.com/r/{}/about.json".format(subreddit)
+    res = requests.get(url, headers=headers, allow_redirects=False)
+    if res.status_code != 200:  # search item not found?
+        return 0
 
-# Example usage
-subreddit_name = 'programming'
-subscriber_count = number_of_subscribers(subreddit_name)
-print(f"The subreddit '{subreddit_name}' has {subscriber_count} subscribers.")
+    res_json = res.json()  # get json output
+    res_data = res_json["data"]  # the required dictionary is in "data" key
+    if "subscribers" in res_data:
+        num_subscribers = res_data["subscribers"]  # .. in "subscribers" field
+    else:
+        num_subscribers = 0  # no subscribers
+    return num_subscribers
+
+
+if __name__ == "__main__":
+    import sys
+    if len(sys.argv) < 2:
+        print("Search argument required")
+        exit()
+    print(number_of_subscribers(sys.argv[1]))
